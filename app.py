@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, session, Response, 
 from database import get_connection
 from datetime import datetime, timedelta
 import uuid
-import cv2
+import threading
 
 import blocker
 import detector
@@ -10,6 +10,10 @@ import detector
 app = Flask(__name__)
 app.secret_key = "Group7_netad"
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=30)
+
+# --- Camera streaming globals ---
+latest_frame = None
+frame_lock = threading.Lock()
 
 
 def get_device_id():
@@ -177,12 +181,7 @@ def analytics():
     )
 
 
-import threading
-
-latest_frame = None
-frame_lock = threading.Lock()
-
-
+# --- Receives frames from local stream.py script ---
 @app.route("/upload_frame", methods=["POST"])
 def upload_frame():
     global latest_frame
@@ -209,3 +208,13 @@ def video_feed():
         return "Unauthorized", 403
     return Response(generate_frames(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/")
+
+
+if __name__ == "__main__":
+    app.run(debug=True, use_reloader=False)
