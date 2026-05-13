@@ -1,7 +1,7 @@
 import cv2
 import requests
 
-RAILWAY_URL = "https://testa-production.up.railway.app"
+RAILWAY_URL = "https://testa-production.up.railway.app/upload_frame"
 
 cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
